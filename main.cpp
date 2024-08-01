@@ -2,6 +2,8 @@
 #include <iomanip>
 #include <ctime>
 #include <cmath>
+#include <string>
+#include <algorithm>
 
 #define matriz 7
 #define diamantes 7
@@ -12,9 +14,9 @@
 using namespace std;
 
 int main() {
-	int i, j, k, number_players, rounds, random, linha, coluna, amount; 
-	char coordenadas[14] = {'0','A', 'B', 'C', 'D', 'E', 'F', '1', '2', '3', '4', '5', '6'};
-	string Board[matriz][matriz], player_board[matriz][matriz], moves[36], move;
+	int i, j, k, number_players, rounds, random, linha, coluna, amount, moves_pos; 
+	char coordenadas[13] = {'0','A', 'B', 'C', 'D', 'E', 'F', '1', '2', '3', '4', '5', '6'};
+	string Board[matriz][matriz], player_board[matriz][matriz], move;
 
 	amount = 0;
 
@@ -30,14 +32,16 @@ int main() {
 
 	for (i = 0; i < number_players; i++) {
 		cout << "\x1B[3" << i + 1 << "m" << "Nome do jogador " << i + 1 << ": \033[0m";
-		cin >> players[i];
+		while (players[i] == "") {
+			getline(cin, players[i]);
+		}
 	}
-	for (i = 0; i < number_players; i++) {
-		cout << players[i] << endl;
-	}
+	cout << endl;
 	
-	rounds = (pow((matriz - 1), 2));
-	
+	//rounds = (pow((matriz - 1), 2));
+	rounds = 3;
+	moves_pos = rounds * number_players;
+	string moves[moves_pos];
 
 	// criação da matriz do jogo
 	for (i = 0; i < matriz; i++) {
@@ -112,22 +116,31 @@ int main() {
 
 
 	// jogo
-	while (rounds--) {
+	rounds--;
+	moves_pos--;
+	while (rounds >= 0) {
 		//imprimir placar
 		cout << "\033[3;43;30m----- PLACAR -----\033[0m" << endl;
 		for (i = 0; i < number_players; i++) {
 			cout << "\x1B[3" << i + 1 << "m" << players[i] << ":\033[0m " << players_score[i] << endl;
 		}
-		cout << "Faltam " << rounds + 1 << " rodadas para acabar o jogo" << endl;
+		cout << "Faltam " << rounds + 1 << " rodadas para acabar o jogo" << endl << endl;
+
+		// jogadas já realizadas
+		cout << "Jogadas realizadas: ";
+		for (i = 5; i >= moves_pos; i--) {
+			cout << moves[i] << "\t";
+		}
+		cout << endl;
 
 		// imprimir tabuleiro
-		cout << "\033[3;43;30m----- TABULEIRO -----\033[0m" << endl;
-		for (i = 0; i < matriz; i++) {
-			for (j = 0;  j < matriz; j++) {
-				cout << setw(9) << Board[i][j];
-			}
-			cout << endl;
-		}
+		cout << "\033[3;43;30m----- TABULEIRO -----\033[0m";
+		//for (i = 0; i < matriz; i++) {
+		//	for (j = 0;  j < matriz; j++) {
+		//		cout << setw(9) << Board[i][j];
+		//	}
+		//	cout << endl;
+		//}
 
 		// imprimir tabuleiro do jogador
 		cout << endl << endl;
@@ -144,20 +157,51 @@ int main() {
 		for (k = 0; k < number_players; k++) {
 			cout << "\x1B[3" << k + 1 << "m" << "Ação do jogador " << players[k] << ":\033[0m ";
 			cin >> move;
+			transform(move.begin(), move.end(), move.begin(), ::toupper);
 			for (i = 0; i < matriz; i++) {
 			    for (j = 0; j < matriz; j++) {
 			        if (move == player_board[i][j]) {
-						moves[rounds - 1] = move;
+						moves[moves_pos] = move;
 			            player_board[i][j] = Board[i][j];
 						if (Board[i][j] == "D") {
 							amount = (rand()%10) + 1;
 							players_score[k] += amount;
+							cout << "\x1B[3" << k + 1 << "m" << players[k] << " encontrou " << amount << " quilates:\033[0m ";
+							cout << endl;
 						}
+						moves_pos--;
 			        }
 			    }
 			}
-			cout << "\x1B[3" << k + 1 << "m" << players[k] << " encontrou " << amount << " quilates:\033[0m ";
-			cout << endl;
 		}
+		rounds--;
 	}
+
+
+	//imprimir placar final
+	cout << "\033[3;43;30m----- PLACAR -----\033[0m" << endl;
+	for (i = 0; i < number_players; i++) {
+		cout << "\x1B[3" << i + 1 << "m" << players[i] << ":\033[0m " << players_score[i] << endl;
+	}
+
+	// jogadas já realizadas
+	moves_pos++;
+	cout << "Jogadas realizadas: ";
+	for (i = 5; i >= moves_pos; i--) {
+		cout << moves[i] << "\t";
+	}
+	cout << endl;
+	
+	//imprimir tabuleiro final
+	cout << "\033[3;43;30m----- TABULEIRO -----\033[0m" << endl;
+	for (i = 0; i < matriz; i++) {
+		for (j = 0;  j < matriz; j++) {
+			cout << setw(9) << player_board[i][j];
+		}
+		cout << endl;
+	}
+	cout << endl;
+	
+	//resultado do jogo
+	cout << "O jogo chegou ao fim!" << endl;
 }
