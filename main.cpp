@@ -1,6 +1,6 @@
 #include <iostream>
 #include <iomanip> //setw
-// #include <ctime> 
+#include <climits> 
 #include <cmath> //power
 #include <string> //getline
 #include <algorithm> //transform
@@ -14,10 +14,9 @@
 
 using namespace std;
 
-int i, j, k, l, movement_analysis, number_players, rounds, linha, coluna, amount = 0, moves_pos, randomize, guess; 
+int i, j, k, number_players, rounds, linha, coluna, randomize, guess; 
 char coordenadas[13] = {'0','A', 'B', 'C', 'D', 'E', 'F', '1', '2', '3', '4', '5', '6'};
-string Board[field][field], player_board[field][field], movement, next_round;
-bool discount = false;
+string Board[field][field], player_board[field][field], movement;
 
 
 int duplicate(int duplicated) {
@@ -159,6 +158,11 @@ int calculate(int subtraction) {
 
 
 int main() {
+	int l, moves_pos, movement_analysis, amount = 0, maior = {INT_MIN}, menor = {INT_MAX}, draw_check[number_players] = {0};
+	string next_round;
+	bool discount = false;
+
+
 	srand(time(NULL));
 
 	// criação dos jogadores
@@ -341,7 +345,6 @@ int main() {
 			}
 		}
 
-		rounds--;
 		if (rounds >= 0) {
 			cout << "Pronto para o próximo turno? Digite 'S' para continuar..." << endl;
 			while (next_round != "S") {
@@ -349,12 +352,12 @@ int main() {
 			transform(next_round.begin(), next_round.end(), next_round.begin(), ::toupper);
 			} 
 		} else {
-			cout << "Você não tem mais turnos para jogar" << endl;
 		}
+		rounds--;
 		next_round = " ";
-		//system("clear||cls");
+		system("clear||cls");
 	}
-
+	cout << "O " << endl;
 
 	//imprimir placar final
 	cout << "\033[3;43;30m----- PLACAR -----\033[0m" << endl;
@@ -365,7 +368,7 @@ int main() {
 	// jogadas já realizadas
 	moves_pos++;
 	cout << "Jogadas realizadas: ";
-	for (i = 5; i >= moves_pos; i--) {
+	for (i = movement_analysis; i >= moves_pos; i--) {
 		cout << moves[i] << " ";
 	}
 	cout << endl;
@@ -381,5 +384,15 @@ int main() {
 	cout << endl;
 	
 	//resultado do jogo
-	cout << "O jogo chegou ao fim!" << endl;
+	for (i = 0; i < number_players; i++) {
+		if (players_score[i] > maior) {
+			maior = players_score[i];
+		} else if (players_score[i] < menor) {
+			menor = players_score[i];
+		} else {
+			draw_check[i] = players_score[i];
+		}
+	}
+	cout << "O jogo chegou ao fim!" << endl << "\033[3;43;30mVencedor é: \033[0m" << endl;;
+	cout << maior << endl << menor<< endl;
 }
